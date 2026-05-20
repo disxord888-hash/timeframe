@@ -251,20 +251,22 @@
 
     // --- Font Size Sliders ---
     const fontSizeConfig = [
-        { sliderId: 'fs-tl', valId: 'fs-tl-val', targetEl: customTextEl },
-        { sliderId: 'fs-tr', valId: 'fs-tr-val', targetEl: timecodeEl },
-        { sliderId: 'fs-bl', valId: 'fs-bl-val', targetEl: dateDisplayEl },
-        { sliderId: 'fs-br', valId: 'fs-br-val', targetEl: clockDisplayEl },
+        { sliderId: 'fs-tl', valId: 'fs-tl-val', targetEls: [customTextEl] },
+        { sliderId: 'fs-tr', valId: 'fs-tr-val', targetEls: [timecodeEl, document.getElementById('ep-label')] },
+        { sliderId: 'fs-bl', valId: 'fs-bl-val', targetEls: [dateDisplayEl] },
+        { sliderId: 'fs-br', valId: 'fs-br-val', targetEls: [clockDisplayEl] },
     ];
 
-    fontSizeConfig.forEach(({ sliderId, valId, targetEl }) => {
+    fontSizeConfig.forEach(({ sliderId, valId, targetEls }) => {
         const slider = document.getElementById(sliderId);
         const valDisplay = document.getElementById(valId);
-        if (!slider || !valDisplay || !targetEl) return;
+        if (!slider || !valDisplay) return;
 
         slider.addEventListener('input', () => {
             const size = slider.value;
-            targetEl.style.fontSize = size + 'px';
+            targetEls.forEach(el => {
+                if (el) el.style.fontSize = size + 'px';
+            });
             valDisplay.textContent = size + 'px';
         });
     });
