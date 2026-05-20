@@ -13,8 +13,10 @@
 <body>
     <!-- メインフレーム -->
     <div id="timeframe-container" class="timeframe-container">
-        <!-- 背景写真 -->
-        <img id="bg-image" class="bg-image" src="default-bg.png" alt="Background">
+        <!-- 背景コンテナ -->
+        <div id="bg-container" class="bg-container">
+            <img class="bg-media active" src="default-bg.png" alt="Background">
+        </div>
         
         <!-- フレームオーバーレイ -->
         <div class="frame-overlay">
@@ -31,11 +33,7 @@
                 <div class="crosshair-circle"></div>
             </div>
 
-            <!-- REC インジケーター -->
-            <div class="rec-indicator">
-                <span class="rec-dot"></span>
-                <span class="rec-text">REC</span>
-            </div>
+
 
             <!-- タイムフレーム情報 -->
             <!-- 左上: 自由テキスト -->
@@ -46,7 +44,7 @@
             
             <!-- 右上: mm:ss:ff (24フレーム) -->
             <div id="info-tr" class="info-block info-tr">
-                <span class="info-label">TIMECODE</span>
+                <span id="ep-label" class="info-value timecode">EP <span style="font-family: var(--font-sans); font-size: 0.75em; margin-left: 2px;">▶</span></span>
                 <span id="timecode" class="info-value timecode">00:00:00</span>
             </div>
             
@@ -87,7 +85,7 @@
             <div class="setting-group">
                 <label for="bg-upload">背景画像を変更</label>
                 <div class="upload-area" id="upload-area">
-                    <input type="file" id="bg-upload" accept="image/*" hidden>
+                    <input type="file" id="bg-upload" accept="image/*,video/*" multiple hidden>
                     <div class="upload-content">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -161,7 +159,7 @@
     </div>
 
     <!-- 隠しファイル入力 -->
-    <input type="file" id="hidden-file-input" accept="image/*" hidden>
+    <input type="file" id="hidden-file-input" accept="image/*,video/*" multiple hidden>
 
     <script src="script.js"></script>
 </body>

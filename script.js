@@ -11,7 +11,7 @@
     const timecodeEl = document.getElementById('timecode');
     const dateDisplayEl = document.getElementById('date-display');
     const clockDisplayEl = document.getElementById('clock-display');
-    const bgImage = document.getElementById('bg-image');
+    const bgContainer = document.getElementById('bg-container');
     const container = document.getElementById('timeframe-container');
 
     // Settings
@@ -110,15 +110,81 @@
         customTextEl.textContent = e.target.value || 'TIMEFRAME CLOCK';
     });
 
-    // --- Image Upload ---
-    function handleImageUpload(file) {
-        if (!file || !file.type.startsWith('image/')) return;
+    // --- Media Upload & Slideshow ---
+    let mediaPlaylist = [];
+    let currentMediaIndex = -1;
+    let slideshowTimeout = null;
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            bgImage.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+    function handleMediaUpload(fileList) {
+        if (!fileList || fileList.length === 0) return;
+        
+        // Extract valid image/video files
+        const newFiles = Array.from(fileList).filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+        if (newFiles.length === 0) return;
+
+        // Revoke old blob URLs to prevent memory leaks
+        mediaPlaylist.forEach(m => URL.revokeObjectURL(m.url));
+        
+        mediaPlaylist = newFiles.map(file => ({
+            url: URL.createObjectURL(file),
+            type: file.type.startsWith('video/') ? 'video' : 'image',
+            file: file
+        }));
+
+        currentMediaIndex = -1;
+        bgContainer.innerHTML = ''; // Clear container
+        playNextMedia();
+    }
+
+    function playNextMedia() {
+        if (mediaPlaylist.length === 0) return;
+        
+        clearTimeout(slideshowTimeout);
+        currentMediaIndex = (currentMediaIndex + 1) % mediaPlaylist.length;
+        const mediaConfig = mediaPlaylist[currentMediaIndex];
+
+        // Ensure crossfade by keeping old active elements around briefly, then removing
+        const oldActive = bgContainer.querySelector('.active');
+        if (oldActive) {
+            oldActive.classList.remove('active');
+            setTimeout(() => {
+                if (oldActive && oldActive.parentNode) {
+                    oldActive.parentNode.removeChild(oldActive);
+                }
+            }, 1000); // 1s transition time
+        }
+
+        let newEl;
+        if (mediaConfig.type === 'video') {
+            newEl = document.createElement('video');
+            newEl.src = mediaConfig.url;
+            newEl.className = 'bg-media';
+            newEl.autoplay = true;
+            newEl.muted = true;
+            newEl.playsInline = true;
+            newEl.loop = mediaPlaylist.length === 1; // loop if single
+            
+            if (mediaPlaylist.length > 1) {
+                newEl.addEventListener('ended', playNextMedia);
+                // Fallback timeout in case video gets stuck or is very short
+                newEl.addEventListener('error', playNextMedia);
+            }
+        } else {
+            newEl = document.createElement('img');
+            newEl.src = mediaConfig.url;
+            newEl.className = 'bg-media';
+            
+            // Auto switch after 5 seconds for images if multiple
+            if (mediaPlaylist.length > 1) {
+                slideshowTimeout = setTimeout(playNextMedia, 5000);
+            }
+        }
+
+        bgContainer.appendChild(newEl);
+        
+        // Trigger reflow securely for CSS animation
+        void newEl.offsetWidth;
+        newEl.classList.add('active');
     }
 
     uploadArea.addEventListener('click', () => {
@@ -126,9 +192,8 @@
     });
 
     bgUpload.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            handleImageUpload(e.target.files[0]);
-        }
+        handleMediaUpload(e.target.files);
+        bgUpload.value = ''; // Reset input
     });
 
     // Drag & Drop
@@ -144,9 +209,7 @@
     uploadArea.addEventListener('drop', (e) => {
         e.preventDefault();
         uploadArea.classList.remove('dragover');
-        if (e.dataTransfer.files.length > 0) {
-            handleImageUpload(e.dataTransfer.files[0]);
-        }
+        handleMediaUpload(e.dataTransfer.files);
     });
 
     // Also allow dropping on the main container
@@ -156,9 +219,7 @@
 
     container.addEventListener('drop', (e) => {
         e.preventDefault();
-        if (e.dataTransfer.files.length > 0) {
-            handleImageUpload(e.dataTransfer.files[0]);
-        }
+        handleMediaUpload(e.dataTransfer.files);
     });
 
     // --- Color Presets ---
