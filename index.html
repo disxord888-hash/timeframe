@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="写真のタイムフレーム風デジタル時計 - カスタマイズ可能な背景画像付き">
+    <title>Timeframe Clock</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- メインフレーム -->
+    <div id="timeframe-container" class="timeframe-container">
+        <!-- 背景写真 -->
+        <img id="bg-image" class="bg-image" src="default-bg.png" alt="Background">
+        
+        <!-- フレームオーバーレイ -->
+        <div class="frame-overlay">
+            <!-- 四隅のブラケット -->
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            
+            <!-- 中央クロスヘア -->
+            <div class="crosshair">
+                <div class="crosshair-h"></div>
+                <div class="crosshair-v"></div>
+                <div class="crosshair-circle"></div>
+            </div>
+
+            <!-- REC インジケーター -->
+            <div class="rec-indicator">
+                <span class="rec-dot"></span>
+                <span class="rec-text">REC</span>
+            </div>
+
+            <!-- タイムフレーム情報 -->
+            <!-- 左上: 自由テキスト -->
+            <div id="info-tl" class="info-block info-tl">
+                <span class="info-label">TITLE</span>
+                <span id="custom-text" class="info-value custom-text">TIMEFRAME CLOCK</span>
+            </div>
+            
+            <!-- 右上: mm:ss:ff (24フレーム) -->
+            <div id="info-tr" class="info-block info-tr">
+                <span class="info-label">TIMECODE</span>
+                <span id="timecode" class="info-value timecode">00:00:00</span>
+            </div>
+            
+            <!-- 左下: アメリカ式日付 -->
+            <div id="info-bl" class="info-block info-bl">
+                <span class="info-label">DATE</span>
+                <span id="date-display" class="info-value date-display">MAY 21 2026</span>
+            </div>
+            
+            <!-- 右下: AM/PM 時刻 -->
+            <div id="info-br" class="info-block info-br">
+                <span class="info-label">CLOCK</span>
+                <span id="clock-display" class="info-value clock-display">AM 5-22-42</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定パネル -->
+    <div id="settings-toggle" class="settings-toggle" title="設定を開く">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+    </div>
+
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-header">
+            <h2>⚙ 設定</h2>
+            <button id="settings-close" class="settings-close">&times;</button>
+        </div>
+        
+        <div class="settings-body">
+            <div class="setting-group">
+                <label for="custom-text-input">左上テキスト</label>
+                <input type="text" id="custom-text-input" value="TIMEFRAME CLOCK" maxlength="30" placeholder="自由なテキストを入力">
+            </div>
+            
+            <div class="setting-group">
+                <label for="bg-upload">背景画像を変更</label>
+                <div class="upload-area" id="upload-area">
+                    <input type="file" id="bg-upload" accept="image/*" hidden>
+                    <div class="upload-content">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>クリックまたはドラッグ&ドロップ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label for="frame-color">フレームカラー</label>
+                <div class="color-presets">
+                    <button class="color-btn active" data-color="#ffffff" style="background:#ffffff"></button>
+                    <button class="color-btn" data-color="#00ff88" style="background:#00ff88"></button>
+                    <button class="color-btn" data-color="#ff4444" style="background:#ff4444"></button>
+                    <button class="color-btn" data-color="#44aaff" style="background:#44aaff"></button>
+                    <button class="color-btn" data-color="#ffaa00" style="background:#ffaa00"></button>
+                    <button class="color-btn" data-color="#ff44ff" style="background:#ff44ff"></button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>フレームスタイル</label>
+                <div class="style-presets">
+                    <button class="style-btn active" data-style="cinematic">Cinematic</button>
+                    <button class="style-btn" data-style="minimal">Minimal</button>
+                    <button class="style-btn" data-style="broadcast">Broadcast</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>文字サイズ</label>
+                <div class="font-size-control">
+                    <span class="fs-label">左上 テキスト</span>
+                    <div class="fs-slider-row">
+                        <input type="range" id="fs-tl" class="fs-range" min="8" max="80" value="22">
+                        <span id="fs-tl-val" class="fs-val">22px</span>
+                    </div>
+                </div>
+                <div class="font-size-control">
+                    <span class="fs-label">右上 タイムコード</span>
+                    <div class="fs-slider-row">
+                        <input type="range" id="fs-tr" class="fs-range" min="8" max="80" value="28">
+                        <span id="fs-tr-val" class="fs-val">28px</span>
+                    </div>
+                </div>
+                <div class="font-size-control">
+                    <span class="fs-label">左下 日付</span>
+                    <div class="fs-slider-row">
+                        <input type="range" id="fs-bl" class="fs-range" min="8" max="80" value="22">
+                        <span id="fs-bl-val" class="fs-val">22px</span>
+                    </div>
+                </div>
+                <div class="font-size-control">
+                    <span class="fs-label">右下 時計</span>
+                    <div class="fs-slider-row">
+                        <input type="range" id="fs-br" class="fs-range" min="8" max="80" value="28">
+                        <span id="fs-br-val" class="fs-val">28px</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" id="fullscreen-toggle"> フルスクリーン
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 隠しファイル入力 -->
+    <input type="file" id="hidden-file-input" accept="image/*" hidden>
+
+    <script src="script.js"></script>
+</body>
+</html>
